@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학생 상담 신청</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #8a8f9c;
+    --accent: #6c5ce7;
+    --accent-light: #efeafd;
+    --border: #e6e8ec;
+    --danger: #ff6b6b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171d;
+      --card-bg: #1f2129;
+      --text: #eceef2;
+      --muted: #8a8f9c;
+      --accent: #8f7bf0;
+      --accent-light: #2a2540;
+      --border: #2c2e38;
+      --danger: #ff6b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .app {
+    width: 100%;
+    max-width: 640px;
+  }
+  header h1 {
+    font-size: 26px;
+    margin: 0 0 4px;
+  }
+  header p {
+    color: var(--muted);
+    margin: 0 0 24px;
+    font-size: 14px;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-size: 17px;
+    margin: 0 0 16px;
+  }
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .field-row {
+    display: flex;
+    gap: 10px;
+  }
+  .field-row .field {
+    flex: 1;
+  }
+  input[type="text"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .error-msg {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .submit-btn:active { transform: scale(0.99); }
+
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .list-header h2 {
+    font-size: 17px;
+    margin: 0;
+    white-space: nowrap;
+  }
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 260px;
+  }
+  .search-box input {
+    padding-left: 34px;
+  }
+  .search-box::before {
+    content: "\1F50D";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    opacity: 0.6;
+  }
+  .count-badge {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  ul.request-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  li.request-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .req-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .req-name-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .req-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .req-class {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .delete-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px 8px;
+    line-height: 1;
+    border-radius: 8px;
+  }
+  .delete-btn:hover {
+    color: var(--danger);
+    background: var(--accent-light);
+  }
+  .req-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .req-content {
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 36px 0;
+    font-size: 14px;
+  }
+  mark {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 3px;
+    padding: 0 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>학생 상담 신청</h1>
+      <p>상담을 신청하고, 신청 목록을 검색해볼 수 있어요.</p>
+    </header>
+
+    <div class="card">
+      <h2>상담 신청하기</h2>
+      <form id="counseling-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="student-name">학생 이름 *</label>
+            <input type="text" id="student-name" maxlength="30" placeholder="예: 홍길동" />
+          </div>
+          <div class="field">
+            <label for="student-class">학년 / 반</label>
+            <input type="text" id="student-class" maxlength="20" placeholder="예: 2학년 3반" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="counseling-type">상담 유형</label>
+            <select id="counseling-type">
+              <option value="학업">학업</option>
+              <option value="교우관계">교우관계</option>
+              <option value="진로">진로</option>
+              <option value="가정">가정</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="counseling-date">희망 일자</label>
+            <input type="date" id="counseling-date" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="counseling-content">상담 내용 *</label>
+          <textarea id="counseling-content" maxlength="1000" placeholder="상담받고 싶은 내용을 자유롭게 적어주세요."></textarea>
+        </div>
+        <div class="error-msg" id="error-msg">학생 이름과 상담 내용을 입력해주세요.</div>
+        <button type="submit" class="submit-btn">신청하기</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="list-header">
+        <h2>신청 목록</h2>
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="이름, 유형, 내용 검색" />
+        </div>
+      </div>
+      <div class="count-badge" id="count-badge">0건</div>
+      <ul class="request-list" id="request-list"></ul>
+      <div class="empty" id="empty-msg" style="display:none;">신청 내역이 없어요.</div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'student-counseling-requests';
+
+  const form = document.getElementById('counseling-form');
+  const nameInput = document.getElementById('student-name');
+  const classInput = document.getElementById('student-class');
+  const typeInput = document.getElementById('counseling-type');
+  const dateInput = document.getElementById('counseling-date');
+  const contentInput = document.getElementById('counseling-content');
+  const errorMsg = document.getElementById('error-msg');
+  const searchInput = document.getElementById('search-input');
+  const requestList = document.getElementById('request-list');
+  const emptyMsg = document.getElementById('empty-msg');
+  const countBadge = document.getElementById('count-badge');
+
+  function loadRequests() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveRequests(requests) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+  }
+
+  let requests = loadRequests();
+  let searchTerm = '';
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function highlight(text, term) {
+    const escaped = escapeHtml(text);
+    if (!term) return escaped;
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('(' + escapedTerm + ')', 'ig');
+    return escaped.replace(re, '<mark>$1</mark>');
+  }
+
+  function formatDateTime(iso) {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} 신청`;
+  }
+
+  function render() {
+    const term = searchTerm.trim().toLowerCase();
+    const filtered = term
+      ? requests.filter((r) =>
+          r.name.toLowerCase().includes(term) ||
+          r.className.toLowerCase().includes(term) ||
+          r.type.toLowerCase().includes(term) ||
+          r.content.toLowerCase().includes(term)
+        )
+      : requests;
+
+    requestList.innerHTML = '';
+    countBadge.textContent = `${filtered.length}건${term ? ` (전체 ${requests.length}건 중 검색됨)` : ''}`;
+
+    if (filtered.length === 0) {
+      emptyMsg.style.display = 'block';
+      emptyMsg.textContent = requests.length === 0
+        ? '신청 내역이 없어요.'
+        : '검색 결과가 없어요.';
+    } else {
+      emptyMsg.style.display = 'none';
+      filtered
+        .slice()
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .forEach((r) => {
+          const li = document.createElement('li');
+          li.className = 'request-item';
+          li.innerHTML = `
+            <div class="req-top">
+              <div class="req-name-group">
+                <span class="req-name">${highlight(r.name, term)}</span>
+                ${r.className ? `<span class="req-class">${highlight(r.className, term)}</span>` : ''}
+                <span class="badge">${highlight(r.type, term)}</span>
+              </div>
+              <button class="delete-btn" data-id="${r.id}" aria-label="삭제">&times;</button>
+            </div>
+            <div class="req-meta">${formatDateTime(r.createdAt)}${r.date ? ` · 희망일 ${r.date}` : ''}</div>
+            <div class="req-content">${highlight(r.content, term)}</div>
+          `;
+          requestList.appendChild(li);
+        });
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    const content = contentInput.value.trim();
+    if (!name || !content) {
+      errorMsg.style.display = 'block';
+      return;
+    }
+    errorMsg.style.display = 'none';
+
+    requests.push({
+      id: Date.now() + Math.random(),
+      name,
+      className: classInput.value.trim(),
+      type: typeInput.value,
+      date: dateInput.value,
+      content,
+      createdAt: Date.now(),
+    });
+    saveRequests(requests);
+
+    form.reset();
+    render();
+    nameInput.focus();
+  });
+
+  requestList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.delete-btn');
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    requests = requests.filter((r) => r.id !== id);
+    saveRequests(requests);
+    render();
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
